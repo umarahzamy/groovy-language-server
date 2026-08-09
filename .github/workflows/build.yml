@@ -30,16 +30,25 @@ jobs:
           if gh release view "$VER" >/dev/null 2>&1; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
-      - name: Rename jar
-        run: mv src/build/libs/*-all.jar src/build/libs/groovy-language-server.jar
+      - name: Package tarball
+        run: |
+          mkdir -p dist/bin dist/lib
+          mv src/build/libs/*-all.jar dist/lib/groovy-language-server.jar
+          cat > dist/bin/groovy-language-server << 'EOF'
+          #!/usr/bin/env sh
+          DIR="$(cd "$(dirname "$(readlink -f "$0")")/../lib" && pwd)"
+          exec java -jar "$DIR/groovy-language-server.jar" "$@"
+          EOF
+          chmod +x dist/bin/groovy-language-server
+          tar -czf groovy-language-server.tar.gz -C dist .
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          path: src/build/libs/groovy-language-server.jar
+          path: groovy-language-server.tar.gz
           archive: false
       - name: Release
         if: steps.ver.outputs.skip != 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.ver.outputs.version }}
-          files: src/build/libs/groovy-language-server.jar
+          files: groovy-language-server.tar.gz
