@@ -40,6 +40,11 @@ jobs:
           exec java -jar "$DIR/groovy-language-server.jar" "$@"
           EOF
           chmod +x dist/bin/groovy-language-server
+          cat > dist/bin/groovy-language-server.cmd << 'EOF'
+          @echo off
+          set "DIR=%~dp0.."
+          java -jar "%DIR%\lib\groovy-language-server.jar" %*
+          EOF
           tar -czf groovy-language-server.tar.gz -C dist .
       - name: Upload artifact
         uses: actions/upload-artifact@v7
