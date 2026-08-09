@@ -33,11 +33,11 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          path: src/build/libs/groovy-language-server-all.jar
+          path: src/build/libs/*-all.jar
           archive: false
       - name: Release
         if: steps.ver.outputs.skip != 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.ver.outputs.version }}
-          files: src/build/libs/groovy-language-server-all.jar
+          files: src/build/libs/*-all.jar
